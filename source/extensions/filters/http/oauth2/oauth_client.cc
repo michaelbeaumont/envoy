@@ -27,6 +27,10 @@ namespace {
 constexpr const char* UrlBodyTemplateWithCredentialsForAuthCode =
     "grant_type=authorization_code&code={0}&client_id={1}&client_secret={2}&redirect_uri={3}&code_"
     "verifier={4}";
+constexpr const char* UrlBodyTemplateWithJwtBearerForAuthCode =
+    "grant_type=authorization_code&code={0}&client_id={1}"
+    "&client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer"
+    "&client_assertion={2}&redirect_uri={3}&code_verifier={4}";
 
 constexpr const char* UrlBodyTemplateWithoutCredentialsForAuthCode =
     "grant_type=authorization_code&code={0}&redirect_uri={1}&code_verifier={2}";
@@ -64,6 +68,12 @@ void OAuth2ClientImpl::asyncGetAccessToken(const std::string& auth_code,
     request->headers().appendCopy(Http::CustomHeaders::get().Authorization,
                                   basic_auth_header_value);
     body = fmt::format(UrlBodyTemplateWithoutCredentialsForAuthCode, auth_code, encoded_cb_url,
+                       code_verifier);
+    break;
+  case AuthType::JwtBearer:
+    body = fmt::format(UrlBodyTemplateWithJwtBearerForAuthCode, auth_code,
+                       Http::Utility::PercentEncoding::encode(client_id, ":/=&?"),
+                       Http::Utility::PercentEncoding::encode(secret, ":/=&?"), encoded_cb_url,
                        code_verifier);
     break;
   }

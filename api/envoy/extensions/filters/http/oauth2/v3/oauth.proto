@@ -135,6 +135,9 @@ message OAuth2Config {
 
     // The ``client_id`` and ``client_secret`` will be sent using HTTP Basic authentication scheme.
     BASIC_AUTH = 1;
+
+    // The ``client_id`` and ``token_secret`` will be sent as a JWT bearer as defined by RFC 7523.
+    JWT_BEARER = 2;
   }
 
   // Endpoint on the authorization server to retrieve the access token from.
